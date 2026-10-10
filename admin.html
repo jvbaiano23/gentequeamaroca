@@ -5,8 +5,8 @@
 <div id="lg" class="card" hidden><label>E-mail<input id="em" type="email" autocomplete="username"></label><label>Senha<input id="pw" type="password" autocomplete="current-password"></label><button class="p" id="in">Entrar</button> <span id="err" class="mu"></span></div>
 <div id="app" hidden>
 <div class="row"><button data-t="pr" class="on">Produtos</button><button data-t="pd">Pedidos</button><span class="g"></span><button id="out">Sair</button></div>
-<section id="pr"><p><button class="p" id="new">+ Novo produto</button> <button id="rf">Atualizar</button></p><div id="pl"></div></section>
-<section id="pd" hidden><div id="ol"></div></section></div>
+<section id="pr"><p><button class="p" id="new">+ Novo produto</button> <button id="rf">Atualizar</button> <input id="qp" type="search" class="g" placeholder="Buscar produto…"></p><div id="pl"></div></section>
+<section id="pd" hidden><p class="row"><input id="qo" type="search" class="g" placeholder="Buscar pedido, cliente, bairro, telefone ou produto…"><select id="so"></select></p><p class="row"><button id="ex">Exportar pedidos (.txt)</button><button id="clr">Apagar histórico</button><span id="cn" class="mu"></span></p><div id="ol"></div></section></div>
 <dialog id="fm"><form id="ff"><h2 id="ft">Produto</h2>
 <label>Nome<input id="fn" required></label><label>Categoria<select id="fc"></select></label><label>Descrição<textarea id="fd" rows="2"></textarea></label>
 <label>Preço (R$)<input id="fp" inputmode="decimal" placeholder="29,90" required></label><label>Estoque disponível<input id="fs" type="number" min="0" value="0"></label>
@@ -20,14 +20,16 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const CATS={variados:'Variados',frigorifico:'Nosso Frigorífico',iguarias:'Iguarias do Sertão',pizza:'Mini Pizza',laticinios:'Queijo, Manteiga e Ovos'};
 const ST={aguardando:'Aguardando pagamento',pago:'Pago',entregue:'Entregue',cancelado:'Cancelado'};
 $('#fc').innerHTML=Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
-let P=[],cur=null;
+let P=[],O=[],cur=null;
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 async function boot(){const{data:{session}}=await sb.auth.getSession();$('#lg').hidden=!!session;$('#app').hidden=!session;if(session)loadP()}
 $('#in').onclick=async()=>{const{error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});$('#err').textContent=error?'E-mail ou senha incorretos.':'';boot()};
 $('#out').onclick=async()=>{await sb.auth.signOut();boot()};
 document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b));$('#pr').hidden=b.dataset.t!=='pr';$('#pd').hidden=b.dataset.t!=='pd';b.dataset.t==='pd'?loadO():loadP()});
 async function loadP(){
-  const{data,error}=await sb.from('products').select('*').order('created_at');if(error)return alert(error.message);P=data;
-  $('#pl').innerHTML=P.map(p=>`<div class="card row ${p.visible?'':'off'}">${p.image_url?`<img class="th" src="${esc(p.image_url)}" alt="">`:''}<div class="g"><b>${esc(p.name)}</b><br><span class="mu">${CATS[p.category]||p.category} · ${R(p.price_cents)}${p.visible?'':' · escondido'}${p.stock<=0?' · ESGOTADO':''}</span></div>
+  const{data,error}=await sb.from('products').select('*').order('created_at');if(error)return alert(error.message);P=data;renderP()}
+function renderP(){const q=norm($('#qp').value);
+  $('#pl').innerHTML=P.filter(p=>!q||norm(p.name+' '+(CATS[p.category]||'')).includes(q)).map(p=>`<div class="card row ${p.visible?'':'off'}">${p.image_url?`<img class="th" src="${esc(p.image_url)}" alt="">`:''}<div class="g"><b>${esc(p.name)}</b><br><span class="mu">${CATS[p.category]||p.category} · ${R(p.price_cents)}${p.visible?'':' · escondido'}${p.stock<=0?' · ESGOTADO':''}</span></div>
   <button data-a="d" data-id="${p.id}" data-n="-1">−</button><input type="number" min="0" value="${p.stock}" style="width:72px" data-a="s" data-id="${p.id}"><button data-a="d" data-id="${p.id}" data-n="1">+</button>
   <button data-a="v" data-id="${p.id}">${p.visible?'Esconder':'Mostrar'}</button><button data-a="e" data-id="${p.id}">Editar</button><button data-a="o" data-id="${p.id}">Quem pediu</button></div>`).join('')||'<p class="mu">Nenhum produto.</p>'}
 $('#pl').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.id,p=P.find(x=>x.id===id);
@@ -50,11 +52,21 @@ $('#ff').onsubmit=async e=>{e.preventDefault();let url=cur?.image_url||null;cons
   if(isNaN(row.price_cents))return alert('Preço inválido.');
   const{error}=await(cur?sb.from('products').update(row).eq('id',cur.id):sb.from('products').insert(row));if(error)return alert(error.message);$('#fm').close();loadP()};
 async function loadO(){
-  const{data,error}=await sb.from('orders').select('*,order_items(name,qty,unit_price_cents)').order('created_at',{ascending:false}).limit(100);if(error)return alert(error.message);
-  const base=new URL('./',location).href;
-  $('#ol').innerHTML=data.map(o=>{const txt=`Olá, ${o.customer_name}! Resumo do seu pedido #${o.code} (${ST[o.status]}):\n${o.order_items.map(i=>`${i.qty}x ${i.name}`).join('\n')}\nTotal: ${R(o.total_cents)}`;
-    return `<div class="card ${o.status==='cancelado'?'off':''}"><div class="row"><b class="g">#${o.code} · ${esc(o.customer_name)} · ${esc(o.neighborhood)}</b><b>${R(o.total_cents)}</b></div><div class="mu">${o.order_items.map(i=>`${i.qty}x ${esc(i.name)}`).join(' · ')}</div>
-    <div class="row" style="margin-top:8px"><select data-o="${o.id}" ${o.status==='cancelado'?'disabled':''}>${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}</select><a class="b" target="_blank" href="https://wa.me/${wa(o.phone)}?text=${encodeURIComponent(txt)}">Enviar resumo no WhatsApp</a></div></div>`}).join('')||'<p class="mu">Nenhum pedido ainda.</p>'}
+  const{data,error}=await sb.from('orders').select('*,order_items(name,qty,unit_price_cents)').order('created_at',{ascending:false}).limit(500);if(error)return alert(error.message);O=data;renderO()}
+function renderO(){const L=fo();$('#cn').textContent=`${L.length} pedido(s)`;
+  $('#ol').innerHTML=L.map(o=>{const txt=`Olá, ${o.customer_name}! Resumo do seu pedido #${o.code} (${ST[o.status]}):\n${o.order_items.map(i=>`${i.qty}x ${i.name}`).join('\n')}\nTotal: ${R(o.total_cents)}`;
+    return `<div class="card ${o.status==='cancelado'?'off':''}"><div class="row"><b class="g">#${o.code} · ${esc(o.customer_name)} · ${esc(o.neighborhood)} <span class="mu" style="font-weight:400">${new Date(o.created_at).toLocaleDateString('pt-BR')}</span></b><b>${R(o.total_cents)}</b></div><div class="mu">${o.order_items.map(i=>`${i.qty}x ${esc(i.name)}`).join(' · ')}</div>
+    <div class="row" style="margin-top:8px"><select data-o="${o.id}" ${o.status==='cancelado'?'disabled':''}>${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}</select><a class="b" target="_blank" href="https://wa.me/${wa(o.phone)}?text=${encodeURIComponent(txt)}">Enviar resumo no WhatsApp</a>${['entregue','cancelado'].includes(o.status)?`<button data-del="${o.id}">Apagar</button>`:''}</div></div>`}).join('')||'<p class="mu">Nenhum pedido ainda.</p>'}
 $('#ol').addEventListener('change',async e=>{const id=e.target.dataset.o;if(!id)return;if(e.target.value==='cancelado'&&!confirm('Cancelar devolve as quantidades ao estoque e não pode ser desfeito. Continuar?'))return loadO();const{error}=await sb.rpc('set_order_status',{p_id:id,p_status:e.target.value});if(error)alert(error.message);loadO()});
+$('#so').innerHTML='<option value="">Todos os status</option>'+Object.entries(ST).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+const fo=()=>{const q=norm($('#qo').value),s=$('#so').value;return O.filter(o=>(!s||o.status===s)&&(!q||norm(`${o.code} ${o.customer_name} ${o.neighborhood} ${o.phone} ${o.order_items.map(i=>i.name).join(' ')}`).includes(q)))};
+$('#qp').oninput=renderP;$('#qo').oninput=renderO;$('#so').onchange=renderO;
+$('#ex').onclick=()=>{const L=fo().slice().sort((a,b)=>a.code-b.code),tot={};if(!L.length)return alert('Nenhum pedido para exportar.');
+  const body=L.map(o=>{if(o.status!=='cancelado')o.order_items.forEach(i=>tot[i.name]=(tot[i.name]||0)+i.qty);
+    return `Pedido #${o.code} · ${new Date(o.created_at).toLocaleString('pt-BR')} · ${ST[o.status]}\nCliente: ${o.customer_name} · Bairro: ${o.neighborhood} · WhatsApp: ${o.phone}\n${o.order_items.map(i=>`  ${i.qty}x ${i.name} (${R(i.unit_price_cents*i.qty)})`).join('\n')}\nTotal: ${R(o.total_cents)}`}).join('\n\n----------------------------------------\n\n');
+  const sum=Object.entries(tot).sort((a,b)=>b[1]-a[1]).map(([n,q])=>`  ${q}x ${n}`).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([`PEDIDOS · Gente que Ama Roça · exportado em ${new Date().toLocaleString('pt-BR')}\n\n${body}\n\n========================================\nTOTAL POR PRODUTO (sem cancelados)\n${sum}\n`],{type:'text/plain;charset=utf-8'}));a.download=`pedidos-${new Date().toISOString().slice(0,10)}.txt`;a.click()};
+$('#ol').addEventListener('click',async e=>{const id=e.target.dataset.del;if(!id||!confirm('Apagar este pedido do histórico? Não dá para desfazer.'))return;const{error}=await sb.rpc('delete_orders',{p_ids:[id]});if(error)alert(error.message);loadO()});
+$('#clr').onclick=async()=>{const n=O.filter(o=>['entregue','cancelado'].includes(o.status)).length;if(!n)return alert('Não há pedidos entregues ou cancelados para apagar.');if(!confirm(`Apagar ${n} pedido(s) entregues/cancelados? Os aguardando pagamento ou pagos ficam. Não dá para desfazer; exporte antes se quiser guardar.`))return;const{error}=await sb.rpc('delete_orders',{p_ids:null});if(error)alert(error.message);loadO()};
 boot();
 </script></body></html>
