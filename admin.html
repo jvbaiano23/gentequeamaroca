@@ -1,0 +1,60 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Admin · Gente que Ama Roça</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>:root{--bg:#1F120C;--sf:#2E1B11;--ln:#4B2E1F;--tx:#F7EBDC;--mu:#CDB59F;--ac:#F26B2A}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,sans-serif}main{max-width:900px;margin:0 auto;padding:16px}h1{font-size:22px}button,input,select,textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:10px}button,a.b{cursor:pointer;background:var(--sf);color:var(--tx);text-decoration:none;border:1px solid var(--ln);border-radius:10px;padding:10px;display:inline-block}button.p{background:var(--ac);color:#1F120C;font-weight:700;border:0}.card{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:14px;margin:10px 0}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.g{flex:1;min-width:160px}img.th{width:56px;height:56px;object-fit:cover;border-radius:10px}.off{opacity:.55}.mu{color:var(--mu)}label{display:grid;gap:4px;margin:8px 0;color:var(--mu);font-size:14px}dialog{background:var(--sf);color:var(--tx);border:1px solid var(--ln);border-radius:14px;max-width:560px;width:92%}dialog::backdrop{background:#000a}.on{background:var(--tx)!important;color:var(--bg)!important}</style></head><body><main>
+<h1>Gente que Ama Roça · Painel</h1>
+<div id="lg" class="card" hidden><label>E-mail<input id="em" type="email" autocomplete="username"></label><label>Senha<input id="pw" type="password" autocomplete="current-password"></label><button class="p" id="in">Entrar</button> <span id="err" class="mu"></span></div>
+<div id="app" hidden>
+<div class="row"><button data-t="pr" class="on">Produtos</button><button data-t="pd">Pedidos</button><span class="g"></span><button id="out">Sair</button></div>
+<section id="pr"><p><button class="p" id="new">+ Novo produto</button> <button id="rf">Atualizar</button></p><div id="pl"></div></section>
+<section id="pd" hidden><div id="ol"></div></section></div>
+<dialog id="fm"><form id="ff"><h2 id="ft">Produto</h2>
+<label>Nome<input id="fn" required></label><label>Categoria<select id="fc"></select></label><label>Descrição<textarea id="fd" rows="2"></textarea></label>
+<label>Preço (R$)<input id="fp" inputmode="decimal" placeholder="29,90" required></label><label>Estoque disponível<input id="fs" type="number" min="0" value="0"></label>
+<label>Foto<input id="fi" type="file" accept="image/*"></label><label class="row"><input id="fv" type="checkbox" checked style="width:auto"> Visível no cardápio</label>
+<div class="row"><button class="p">Salvar</button><button type="button" id="fx">Cancelar</button></div></form></dialog>
+<dialog id="dt"><h2 id="dh"></h2><div id="db"></div><button id="dx">Fechar</button></dialog>
+</main><script>
+const sb=supabase.createClient("https://gtwqyqrrogalmiizhwjj.supabase.co","sb_publishable_1dYDfU06qSorVODsOmSlbg_lx1yLGVr");
+const $=s=>document.querySelector(s),R=c=>(c/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const CATS={variados:'Variados',frigorifico:'Nosso Frigorífico',iguarias:'Iguarias do Sertão',pizza:'Mini Pizza',laticinios:'Queijo, Manteiga e Ovos'};
+const ST={aguardando:'Aguardando pagamento',pago:'Pago',entregue:'Entregue',cancelado:'Cancelado'};
+$('#fc').innerHTML=Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+let P=[],cur=null;
+async function boot(){const{data:{session}}=await sb.auth.getSession();$('#lg').hidden=!!session;$('#app').hidden=!session;if(session)loadP()}
+$('#in').onclick=async()=>{const{error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});$('#err').textContent=error?'E-mail ou senha incorretos.':'';boot()};
+$('#out').onclick=async()=>{await sb.auth.signOut();boot()};
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b));$('#pr').hidden=b.dataset.t!=='pr';$('#pd').hidden=b.dataset.t!=='pd';b.dataset.t==='pd'?loadO():loadP()});
+async function loadP(){
+  const{data,error}=await sb.from('products').select('*').order('created_at');if(error)return alert(error.message);P=data;
+  $('#pl').innerHTML=P.map(p=>`<div class="card row ${p.visible?'':'off'}">${p.image_url?`<img class="th" src="${esc(p.image_url)}" alt="">`:''}<div class="g"><b>${esc(p.name)}</b><br><span class="mu">${CATS[p.category]||p.category} · ${R(p.price_cents)}${p.visible?'':' · escondido'}${p.stock<=0?' · ESGOTADO':''}</span></div>
+  <button data-a="d" data-id="${p.id}" data-n="-1">−</button><input type="number" min="0" value="${p.stock}" style="width:72px" data-a="s" data-id="${p.id}"><button data-a="d" data-id="${p.id}" data-n="1">+</button>
+  <button data-a="v" data-id="${p.id}">${p.visible?'Esconder':'Mostrar'}</button><button data-a="e" data-id="${p.id}">Editar</button><button data-a="o" data-id="${p.id}">Quem pediu</button></div>`).join('')||'<p class="mu">Nenhum produto.</p>'}
+$('#pl').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.id,p=P.find(x=>x.id===id);
+  if(b.dataset.a==='d'){const{error}=await sb.rpc('adjust_stock',{p_id:id,p_delta:+b.dataset.n});if(error)alert(error.message);loadP()}
+  if(b.dataset.a==='v'){await sb.from('products').update({visible:!p.visible}).eq('id',id);loadP()}
+  if(b.dataset.a==='e')openF(p);if(b.dataset.a==='o')who(p)});
+$('#pl').addEventListener('change',async e=>{if(e.target.dataset.a!=='s')return;const{error}=await sb.from('products').update({stock:Math.max(0,parseInt(e.target.value)||0)}).eq('id',e.target.dataset.id);if(error)alert(error.message);loadP()});
+async function who(p){
+  const{data,error}=await sb.from('order_items').select('qty,orders!inner(code,customer_name,neighborhood,phone,status)').eq('product_id',p.id);if(error)return alert(error.message);
+  const L=data.sort((a,b)=>a.orders.code-b.orders.code),t=L.filter(i=>i.orders.status!=='cancelado').reduce((a,i)=>a+i.qty,0);
+  $('#dh').textContent=p.name;$('#db').innerHTML=`<p><b>${t} un.</b> em pedidos ativos (sem cancelados)</p>`+(L.map(i=>{const o=i.orders;return `<div class="card"><b>#${o.code}</b> ${esc(o.customer_name)} · ${esc(o.neighborhood)}<br>${i.qty} un. · ${ST[o.status]} · <a class="mu" href="https://wa.me/${wa(o.phone)}" target="_blank">${esc(o.phone)}</a></div>`}).join('')||'<p class="mu">Ninguém pediu ainda.</p>');$('#dt').showModal()}
+const wa=ph=>ph.startsWith('55')&&ph.length>=12?ph:'55'+ph;
+$('#dx').onclick=()=>$('#dt').close();
+function openF(p){cur=p;$('#ft').textContent=p?'Editar produto':'Novo produto';$('#ff').reset();if(p){$('#fn').value=p.name;$('#fc').value=p.category;$('#fd').value=p.description;$('#fp').value=String(p.price_cents/100).replace('.',',');$('#fs').value=p.stock;$('#fv').checked=p.visible}$('#fm').showModal()}
+$('#new').onclick=()=>openF(null);$('#rf').onclick=loadP;$('#fx').onclick=()=>$('#fm').close();
+const shrink=f=>new Promise(r=>{const i=new Image();i.onload=()=>{const k=Math.min(1,1000/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(r,'image/jpeg',.82)};i.src=URL.createObjectURL(f)});
+$('#ff').onsubmit=async e=>{e.preventDefault();let url=cur?.image_url||null;const f=$('#fi').files[0];
+  if(f){const path=`${Date.now()}.jpg`,{error}=await sb.storage.from('produtos').upload(path,await shrink(f),{contentType:'image/jpeg'});if(error)return alert('Falha ao enviar a foto: '+error.message);url=sb.storage.from('produtos').getPublicUrl(path).data.publicUrl}
+  const row={name:$('#fn').value.trim(),category:$('#fc').value,description:$('#fd').value.trim(),price_cents:Math.round(parseFloat($('#fp').value.replace(',','.'))*100),stock:parseInt($('#fs').value)||0,visible:$('#fv').checked,image_url:url};
+  if(isNaN(row.price_cents))return alert('Preço inválido.');
+  const{error}=await(cur?sb.from('products').update(row).eq('id',cur.id):sb.from('products').insert(row));if(error)return alert(error.message);$('#fm').close();loadP()};
+async function loadO(){
+  const{data,error}=await sb.from('orders').select('*,order_items(name,qty,unit_price_cents)').order('created_at',{ascending:false}).limit(100);if(error)return alert(error.message);
+  const base=new URL('./',location).href;
+  $('#ol').innerHTML=data.map(o=>{const txt=`Olá, ${o.customer_name}! Resumo do seu pedido #${o.code} (${ST[o.status]}):\n${o.order_items.map(i=>`${i.qty}x ${i.name}`).join('\n')}\nTotal: ${R(o.total_cents)}`;
+    return `<div class="card ${o.status==='cancelado'?'off':''}"><div class="row"><b class="g">#${o.code} · ${esc(o.customer_name)} · ${esc(o.neighborhood)}</b><b>${R(o.total_cents)}</b></div><div class="mu">${o.order_items.map(i=>`${i.qty}x ${esc(i.name)}`).join(' · ')}</div>
+    <div class="row" style="margin-top:8px"><select data-o="${o.id}" ${o.status==='cancelado'?'disabled':''}>${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}</select><a class="b" target="_blank" href="https://wa.me/${wa(o.phone)}?text=${encodeURIComponent(txt)}">Enviar resumo no WhatsApp</a></div></div>`}).join('')||'<p class="mu">Nenhum pedido ainda.</p>'}
+$('#ol').addEventListener('change',async e=>{const id=e.target.dataset.o;if(!id)return;if(e.target.value==='cancelado'&&!confirm('Cancelar devolve as quantidades ao estoque e não pode ser desfeito. Continuar?'))return loadO();const{error}=await sb.rpc('set_order_status',{p_id:id,p_status:e.target.value});if(error)alert(error.message);loadO()});
+boot();
+</script></body></html>
