@@ -471,7 +471,7 @@ const R=n=>(n/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const rpc=(f,b)=>fetch(`${SB}/rest/v1/rpc/${f}`,{method:'POST',headers:H,body:JSON.stringify(b)});
 const ico=n=>`<svg class="ic"><use href="#i-${n}"/></svg>`;
-const CATS=[['frigorifico','Nosso Frigorífico'],['iguarias','Iguarias do Sertão'],['laticinios','Queijo, Manteiga e Ovos'],['pizza','Mini Pizza'],['variados','Variados']];
+const CATS=[['frigorifico','Nosso Frigorífico'],['delicias_roca','Delícias da Roça'],['iguarias','Iguarias do Sertão'],['congelados','Congelados'],['laticinios','Queijo, Manteiga e Ovos'],['emporio_roca','Empório da Roça'],['polpas','Polpas de Fruta'],['licor','Licor'],['pizza','Mini Pizza'],['variados','Variados'],['doces','Doces'],['atacado','Atacado'],['ofertas_semana','Ofertas da Semana'],['promocoes','Promoções'],['semana_santa','Itens da Semana Santa']];
 // Cardápio reserva (mesmo do index/supabase.sql): usado só se o Supabase não responder.
 const SEED=[
 ['variados','Queijo parmesão ralado fino 50 g','Ideal para acompanhar pratos de massa, cachorro-quente e muito mais.',550,10],
@@ -512,7 +512,7 @@ const render=()=>{
   const L=Object.values(items),cs=CATS.filter(([k])=>L.some(i=>i.c===k));
   // categorias novas criadas no admin também aparecem
   L.forEach(i=>{if(!cs.some(([k])=>k===i.c))cs.push([i.c,i.c])});
-  $('#mn').innerHTML=cs.map(([k,t])=>{const its=L.filter(i=>i.c===k).sort((a,b)=>(b.stock>0)-(a.stock>0));return `<section class="cat" id="c-${esc(k)}" aria-labelledby="h-${esc(k)}"><div class="cat-h"><h3 id="h-${esc(k)}">${esc(t)}</h3><small>${its.length} ${its.length===1?'item':'itens'}</small></div>${k==='pizza'?'<p class="note">Leve 10 unidades por R$ 80,00 — chama no WhatsApp para o combo.</p>':''}<div class="ig">${its.map(card).join('')}</div></section>`}).join('')||'<p class="mstate">Cardápio indisponível agora. Chama a gente no WhatsApp.</p>';
+  $('#mn').innerHTML=cs.map(([k,t])=>{const its=L.filter(i=>i.c===k).sort((a,b)=>(b.stock>0)-(a.stock>0));return `<section class="cat" id="c-${esc(k)}" aria-labelledby="h-${esc(k)}"><div class="cat-h"><h3 id="h-${esc(k)}">${esc(t)}</h3><small>${its.length} ${its.length===1?'item':'itens'}</small></div>${k==='pizza'?'<p class="note">Leve 10 unidades por R$ 80,00 — chama no WhatsApp para o combo.</p>':k==='licor'?'<p class="note">Leve 2 unidades por R$ 50,00 — chama no WhatsApp para o combo.</p>':''}<div class="ig">${its.map(card).join('')}</div></section>`}).join('')||'<p class="mstate">Cardápio indisponível agora. Chama a gente no WhatsApp.</p>';
   $('#tabs').innerHTML=cs.map(([k,t])=>`<a href="#c-${esc(k)}">${esc(t)} <small>${L.filter(i=>i.c===k).length}</small></a>`).join('');
   spy();
   $$('#mn .it').forEach(el=>{el.classList.add('rv');io.observe(el)});

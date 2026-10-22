@@ -269,7 +269,7 @@ const num=v=>Math.round(parseFloat(String(v||'0').replace(',','.'))*100)||0;
 const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
 const wa=ph=>{ph=String(ph||'').replace(/\D/g,'');return ph.startsWith('55')&&ph.length>=12?ph:'55'+ph};
 const waLink=(ph,msg)=>`https://wa.me/${wa(ph)}?text=${encodeURIComponent(msg)}`;
-const CATS={variados:'Variados',frigorifico:'Nosso Frigorífico',iguarias:'Iguarias do Sertão',pizza:'Mini Pizza',laticinios:'Queijo, Manteiga e Ovos'};
+const CATS={frigorifico:'Nosso Frigorífico',delicias_roca:'Delícias da Roça',iguarias:'Iguarias do Sertão',congelados:'Congelados',laticinios:'Queijo, Manteiga e Ovos',emporio_roca:'Empório da Roça',polpas:'Polpas de Fruta',licor:'Licor',pizza:'Mini Pizza',variados:'Variados',doces:'Doces',atacado:'Atacado',ofertas_semana:'Ofertas da Semana',promocoes:'Promoções',semana_santa:'Itens da Semana Santa'};
 const catName=k=>CATS[k]||k;
 const STEPS=[['em_preparo','Em preparação'],['pronto','Pronto'],['a_caminho','No caminho'],['chegou','Chegou'],['entregue','Entregue']];
 function fmtDT(iso){const d=new Date(iso);return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
