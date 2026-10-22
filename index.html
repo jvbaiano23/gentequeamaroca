@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#120A06">
+<meta name="theme-color" content="#FBF6EC">
 <title>Gente que Ama Roça | Sabor de roça entregue em Salvador</title>
 <meta name="description" content="Carne do sol, queijo, iogurte e iguarias do sertão feitos pela família. Peça pelo WhatsApp e receba em Salvador.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,500;1,600&family=Nunito:wght@400;600;700;800&family=Caveat:wght@400;600&display=swap">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥩</text></svg>">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Gente que Ama Roça | Sabor de roça entregue em Salvador">
@@ -19,14 +19,16 @@
 <meta name="twitter:description" content="Carne do sol, queijo, iogurte e iguarias do sertão feitos pela família. Peça pelo WhatsApp e receba em Salvador.">
 <meta name="twitter:image" content="https://picsum.photos/seed/gentequeamaroca/1200/630">
 <style>
-/* Editorial Luxury em tons de espresso e brasa. Mobile-first: tudo começa em 1 coluna e abre a partir de 768px. */
+/* Identidade "Sol da Roça": creme palha + marrom café, amarelo principal,
+   verde folha secundário, vermelho acerola só em pequenos destaques
+   (preço, botão de pedido, selos). Mobile-first: 1 coluna até 768px. */
 :root{
-  --bg:#120A06;--bg2:#1A0F09;--sf:#22140C;--sf2:#2A1910;
-  --ln:rgb(232 196 140/.10);--ln2:rgb(232 196 140/.18);--hi:rgb(255 240 220/.07);
-  --tx:#F6EEE0;--mu:#BFA990;--ac:#F26B2A;--gd:#D9A24B;--ink:#160C07;
+  --bg:#FBF6EC;--bg2:#F3E9D6;--sf:#FFFFFF;--sf2:#F3E9D6;
+  --ln:rgb(62 44 31/.12);--ln2:rgb(62 44 31/.18);--hi:rgb(62 44 31/.05);
+  --tx:#3E2C1F;--mu:#79674F;--ac:#F4B942;--gd:#5B7F3A;--dest:#D64933;--ap:#B5653A;--ink:#3E2C1F;
   --R:28px;--r:calc(var(--R) - 6px);
   --ease:cubic-bezier(.32,.72,0,1);--spring:cubic-bezier(.23,1,.32,1);
-  --serif:'Cormorant Garamond',Georgia,serif;--sans:'Plus Jakarta Sans',system-ui,sans-serif;
+  --serif:'Fraunces',Georgia,serif;--sans:'Nunito',system-ui,sans-serif;--hand:'Caveat',cursive;
   --navh:60px;--gut:16px;
 }
 *{box-sizing:border-box}
@@ -57,13 +59,13 @@ section{padding-block:96px;position:relative}
 /* Ícones finos */
 .ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
-/* Botões: pílula com ícone aninhado */
-.btn{position:relative;display:inline-flex;align-items:center;justify-content:space-between;gap:14px;min-height:54px;padding:6px 6px 6px 24px;border:0;border-radius:999px;background:var(--ac);color:var(--ink);font:700 15px/1 var(--sans);letter-spacing:.01em;cursor:pointer;white-space:nowrap;transition:transform .5s var(--ease),background-color .5s var(--ease),box-shadow .5s var(--ease);box-shadow:0 18px 40px -18px rgb(242 107 42/.55),inset 0 1px 0 rgb(255 255 255/.25);-webkit-tap-highlight-color:transparent}
-.btn .bi{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgb(22 12 7/.14);transition:transform .5s var(--ease)}
+/* Botões: pílula com ícone aninhado. Preenchido = ação de pedido (Vermelho Acerola). */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:space-between;gap:14px;min-height:54px;padding:6px 6px 6px 24px;border:0;border-radius:999px;background:var(--dest);color:var(--bg);font:700 15px/1 var(--sans);letter-spacing:.01em;cursor:pointer;white-space:nowrap;transition:transform .5s var(--ease),background-color .5s var(--ease),box-shadow .5s var(--ease);box-shadow:0 18px 40px -18px rgb(214 73 51/.5),inset 0 1px 0 rgb(255 255 255/.2);-webkit-tap-highlight-color:transparent}
+.btn .bi{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgb(255 255 255/.22);transition:transform .5s var(--ease)}
 .btn:active{transform:scale(.97)}
 @media(hover:hover){.btn:hover .bi{transform:translate(3px,-1px) scale(1.06)}}
 .btn.gh{background:var(--hi);color:var(--tx);box-shadow:inset 0 0 0 1px var(--ln2)}
-.btn.gh .bi{background:rgb(255 240 220/.08)}
+.btn.gh .bi{background:rgb(62 44 31/.08)}
 .btn.nb{padding:0 24px;justify-content:center}
 .btn.sm{min-height:44px;padding:4px 4px 4px 18px;font-size:14px;gap:10px}
 .btn.sm .bi{width:36px;height:36px}
@@ -73,33 +75,33 @@ section{padding-block:96px;position:relative}
 
 /* Bezel duplo */
 .bz{padding:6px;border-radius:var(--R);background:var(--hi);box-shadow:inset 0 0 0 1px var(--ln)}
-.bz>.core{border-radius:var(--r);background:var(--sf);box-shadow:inset 0 1px 0 rgb(255 240 220/.06),0 30px 60px -40px rgb(0 0 0/.6);height:100%}
+.bz>.core{border-radius:var(--r);background:var(--sf);box-shadow:inset 0 1px 0 #fff,0 24px 48px -32px rgb(62 44 31/.18);height:100%}
 
-/* Nav em ilha flutuante */
+/* Nav em ilha flutuante (vidro escuro: funciona sobre a foto do herói e sobre o fundo claro ao rolar) */
 .nav{position:fixed;top:max(10px,env(safe-area-inset-top));left:0;right:0;z-index:20;display:flex;justify-content:center;padding-inline:12px;pointer-events:none}
-.isl{pointer-events:auto;display:flex;align-items:center;gap:8px;width:100%;max-width:760px;height:var(--navh);padding:0 6px 0 20px;border-radius:999px;background:rgb(22 13 8/.72);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);box-shadow:inset 0 0 0 1px var(--ln2),0 20px 50px -25px rgb(0 0 0/.7)}
-.logo{font:600 22px/1 var(--serif);letter-spacing:-.01em;margin-right:auto;white-space:nowrap}
-.logo i{color:var(--gd)}
-.isl .links{display:none;gap:22px;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);margin-right:8px}
+.isl{pointer-events:auto;display:flex;align-items:center;gap:8px;width:100%;max-width:760px;height:var(--navh);padding:0 6px 0 20px;border-radius:999px;background:rgb(62 44 31/.85);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);box-shadow:inset 0 0 0 1px rgb(251 246 236/.14),0 20px 50px -25px rgb(62 44 31/.4)}
+.logo{font:600 22px/1 var(--serif);letter-spacing:-.01em;margin-right:auto;white-space:nowrap;color:var(--bg)}
+.logo i{color:var(--ac)}
+.isl .links{display:none;gap:22px;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgb(251 246 236/.65);margin-right:8px}
 .isl .links a{transition:color .4s var(--ease)}
-@media(hover:hover){.isl .links a:hover{color:var(--tx)}}
-.cartb{position:relative;width:48px;height:48px;border-radius:50%;border:0;background:var(--hi);box-shadow:inset 0 0 0 1px var(--ln);display:grid;place-items:center;cursor:pointer;transition:transform .4s var(--ease)}
+@media(hover:hover){.isl .links a:hover{color:var(--bg)}}
+.cartb{position:relative;width:48px;height:48px;border-radius:50%;border:0;background:rgb(251 246 236/.12);box-shadow:inset 0 0 0 1px rgb(251 246 236/.16);display:grid;place-items:center;cursor:pointer;transition:transform .4s var(--ease);color:var(--bg)}
 .cartb:active{transform:scale(.94)}
 .cartb .ic{width:20px;height:20px}
 #nc{position:absolute;top:2px;right:0;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:var(--ac);color:var(--ink);font:700 11px/19px var(--sans);text-align:center;transform:scale(0);transition:transform .45s var(--spring)}
 #nc.on{transform:scale(1)}
-.burg{position:relative;width:48px;height:48px;border-radius:50%;border:0;background:var(--tx);cursor:pointer}
+.burg{position:relative;width:48px;height:48px;border-radius:50%;border:0;background:var(--bg);cursor:pointer}
 .burg span{position:absolute;left:15px;right:15px;height:1.5px;background:var(--ink);border-radius:2px;transition:transform .6s var(--ease),top .6s var(--ease)}
 .burg span:first-child{top:20px}.burg span:last-child{top:27px}
 .menu-open .burg span:first-child{top:23.5px;transform:rotate(45deg)}
 .menu-open .burg span:last-child{top:23.5px;transform:rotate(-45deg)}
 
 /* Overlay do menu */
-.ov{position:fixed;inset:0;z-index:15;background:rgb(14 8 5/.86);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);display:flex;flex-direction:column;justify-content:center;padding:110px 24px 40px;opacity:0;visibility:hidden;transition:opacity .6s var(--ease),visibility 0s .6s}
+.ov{position:fixed;inset:0;z-index:15;background:rgb(20 14 9/.92);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);display:flex;flex-direction:column;justify-content:center;padding:110px 24px 40px;opacity:0;visibility:hidden;color:var(--bg);transition:opacity .6s var(--ease),visibility 0s .6s}
 .menu-open .ov{opacity:1;visibility:visible;transition:opacity .6s var(--ease)}
 .ov nav{display:grid;gap:4px}
 .ov a.l{display:flex;align-items:baseline;gap:16px;font:500 clamp(44px,12vw,72px)/1.05 var(--serif);padding:6px 0;opacity:0;transform:translateY(48px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
-.ov a.l small{font:600 11px var(--sans);letter-spacing:.2em;color:var(--gd)}
+.ov a.l small{font:600 11px var(--sans);letter-spacing:.2em;color:var(--ac)}
 .menu-open .ov a.l{opacity:1;transform:none}
 .menu-open .ov a.l:nth-child(1){transition-delay:.08s}.menu-open .ov a.l:nth-child(2){transition-delay:.14s}.menu-open .ov a.l:nth-child(3){transition-delay:.2s}.menu-open .ov a.l:nth-child(4){transition-delay:.26s}
 .ov .ft{margin-top:40px;opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease) .32s,transform .8s var(--ease) .32s}
@@ -112,12 +114,15 @@ body.menu-open{overflow:hidden}
 @keyframes hz{to{transform:scale(1)}}
 .hx::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgb(18 10 6/.5) 0%,rgb(18 10 6/.15) 30%,rgb(18 10 6/.82) 70%,var(--bg) 100%)}
 .hx .in-t{max-width:1240px;margin:0 auto;width:100%}
-.hx .lead{color:rgb(246 238 224/.86)}
-.hx .eb{background:rgb(18 10 6/.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.hx h1{color:var(--bg)}
+.hx .lead{color:rgb(251 246 236/.86)}
+.hx .eb{background:rgb(18 10 6/.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--ac)}
 .hx .cta{display:flex;flex-direction:column;gap:10px;margin-top:32px}
 .hx .cta .btn{width:100%}
-.chip{display:inline-flex;align-items:center;gap:10px;margin-top:28px;padding:6px 16px 6px 6px;border-radius:999px;background:rgb(246 238 224/.1);box-shadow:inset 0 0 0 1px var(--ln2);font-size:13px;font-weight:600}
-.chip b{display:grid;place-items:center;white-space:nowrap;min-width:34px;height:34px;padding:0 10px;border-radius:999px;background:var(--tx);color:var(--ink);font:700 12px var(--sans)}
+.hx .btn.gh{background:rgb(251 246 236/.14);color:var(--bg);box-shadow:inset 0 0 0 1px rgb(251 246 236/.3)}
+.hx .btn.gh .bi{background:rgb(251 246 236/.14)}
+.chip{display:inline-flex;align-items:center;gap:10px;margin-top:28px;padding:6px 16px 6px 6px;border-radius:999px;background:rgb(251 246 236/.14);box-shadow:inset 0 0 0 1px rgb(251 246 236/.25);font:600 15px var(--hand);color:var(--bg)}
+.chip b{display:grid;place-items:center;white-space:nowrap;min-width:34px;height:34px;padding:0 10px;border-radius:999px;background:var(--dest);color:var(--bg);font:700 12px var(--sans)}
 
 /* Faixa */
 .mq{overflow:hidden;padding:22px 0;border-block:1px solid var(--ln)}
@@ -140,35 +145,35 @@ body.menu-open{overflow:hidden}
 .tile .core{position:relative;min-height:260px;overflow:hidden;display:flex;align-items:flex-end;isolation:isolate}
 .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform 1.2s var(--ease)}
 .tile .core::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,transparent 30%,rgb(18 10 6/.92))}
-.tile .tx{padding:22px;width:100%;display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.tile .tx{padding:22px;width:100%;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;color:var(--bg)}
 .tile b{display:block;font:600 32px/1 var(--serif)}
-.tile span{display:block;margin-top:8px;font-size:14px;color:var(--mu);max-width:30ch}
-.tile .go{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgb(246 238 224/.12);box-shadow:inset 0 0 0 1px var(--ln2);transition:transform .6s var(--ease)}
+.tile span{display:block;margin-top:8px;font-size:14px;color:rgb(251 246 236/.72);max-width:30ch}
+.tile .go{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgb(251 246 236/.14);box-shadow:inset 0 0 0 1px rgb(251 246 236/.2);transition:transform .6s var(--ease)}
 @media(hover:hover){.tile:hover img{transform:scale(1.06)}.tile:hover .go{transform:translate(3px,-3px)}}
 
 /* Cardápio */
 .mhead{display:flex;flex-direction:column;gap:14px}
 .tabs{position:sticky;top:calc(max(10px,env(safe-area-inset-top)) + var(--navh) + 8px);z-index:10;margin-top:32px;padding-block:6px}
 .tabs::before{content:"";position:absolute;inset:-60px 0 -6px;z-index:-1;background:linear-gradient(180deg,var(--bg) 70%,transparent);pointer-events:none}
-#tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:5px;border-radius:999px;background:rgb(34 20 12/.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:inset 0 0 0 1px var(--ln2);scroll-snap-type:x proximity}
+#tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:5px;border-radius:999px;background:rgb(255 255 255/.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:inset 0 0 0 1px var(--ln2),0 10px 26px -18px rgb(62 44 31/.25);scroll-snap-type:x proximity}
 #tabs::-webkit-scrollbar{display:none}
-#tabs a{flex:none;scroll-snap-align:center;min-height:40px;display:inline-flex;align-items:center;gap:8px;padding:0 16px;border-radius:999px;font-size:13px;font-weight:600;color:var(--mu);white-space:nowrap;transition:background-color .5s var(--ease),color .5s var(--ease)}
+#tabs a{flex:none;scroll-snap-align:center;min-height:40px;display:inline-flex;align-items:center;gap:8px;padding:0 16px;border-radius:999px;font-size:13px;font-weight:700;color:var(--mu);white-space:nowrap;transition:background-color .5s var(--ease),color .5s var(--ease)}
 #tabs a small{font-size:11px;opacity:.7}
-#tabs a[aria-current]{background:var(--tx);color:var(--ink)}
+#tabs a[aria-current]{background:var(--tx);color:var(--bg)}
 .cat{scroll-margin-top:150px;margin-top:48px}
 .cat-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--ln2)}
 .cat-h h3{font-size:clamp(34px,8vw,52px)}
 .cat-h small{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gd);white-space:nowrap}
-.note{margin:-4px 0 16px;padding:12px 16px;border-radius:16px;background:rgb(217 162 75/.08);box-shadow:inset 0 0 0 1px rgb(217 162 75/.2);font-size:14px;color:var(--gd)}
+.note{margin:-4px 0 16px;padding:12px 16px;border-radius:16px;background:rgb(214 73 51/.08);box-shadow:inset 0 0 0 1px rgb(214 73 51/.2);font-size:14px;color:var(--dest);font-weight:600}
 .ig{display:grid;grid-template-columns:1fr;gap:10px}
 .it .core{display:flex;flex-direction:column;gap:14px;padding:20px}
 .it img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px}
 .it h4{font:600 25px/1.08 var(--serif);letter-spacing:-.005em}
 .it p{margin-top:6px;color:var(--mu);font-size:14.5px;line-height:1.5;text-wrap:pretty}
 .it-f{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto;padding-top:14px;border-top:1px solid var(--ln)}
-.pr b{display:block;font:600 26px/1 var(--serif);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pr b{display:block;font:600 26px/1 var(--serif);font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--dest)}
 .pr span{display:block;margin-top:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
-.pr span.lo{color:var(--ac)}
+.pr span.lo{color:var(--ap)}
 .off h4,.off .pr b{color:var(--mu)}
 .off .core{background:var(--bg2)}
 .tg{display:inline-block;margin-left:8px;padding:3px 10px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--mu);font:600 10px/1.4 var(--sans);letter-spacing:.14em;text-transform:uppercase;vertical-align:5px;color:var(--mu)}
@@ -178,7 +183,7 @@ body.menu-open{overflow:hidden}
 .st button:active{transform:scale(.88)}
 .st button[disabled]{opacity:.35;cursor:not-allowed}
 .st output{min-width:30px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
-.add{width:44px;height:44px;border-radius:50%;border:0;background:var(--ac);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 12px 26px -12px rgb(242 107 42/.7);transition:transform .4s var(--spring)}
+.add{width:44px;height:44px;border-radius:50%;border:0;background:var(--ac);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 12px 26px -12px rgb(244 185 66/.55);transition:transform .4s var(--spring)}
 .add:active{transform:scale(.9)}
 .add .ic{width:20px;height:20px;stroke-width:1.8}
 .mstate{padding:40px 0;color:var(--mu)}
@@ -220,7 +225,7 @@ body.menu-open{overflow:hidden}
 .way b{font:600 34px/1.02 var(--serif)}
 .way p{color:var(--mu)}
 .way .btn{margin-top:8px;width:100%}
-.ps{margin-top:36px;color:var(--mu);font-size:14px;max-width:52ch}
+.ps{margin-top:36px;color:var(--mu);font-size:18px;max-width:52ch;font-family:var(--hand)}
 footer{border-top:1px solid var(--ln);padding:28px 0 calc(110px + env(safe-area-inset-bottom));font-size:13px;color:var(--mu)}
 footer .w{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
@@ -354,8 +359,8 @@ body:has(#cart[open]){overflow:hidden}
     <h1>Sabor de <em>roça</em>, direto da nossa família</h1>
     <p class="lead">Queijo, iogurte, carne do sol e iguarias do sertão. Você escolhe aqui, pede no WhatsApp e a gente entrega em Salvador.</p>
     <div class="cta">
-      <a class="btn" href="#cardapio">Ver o cardápio<span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
-      <a class="btn gh" data-wa href="#pedir">Pedir no WhatsApp<span class="bi"><svg class="ic"><use href="#i-wa"/></svg></span></a>
+      <a class="btn gh" href="#cardapio">Ver o cardápio<span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
+      <a class="btn" data-wa href="#pedir">Pedir no WhatsApp<span class="bi"><svg class="ic"><use href="#i-wa"/></svg></span></a>
     </div>
     <span class="chip"><b>R$ 32</b>Carne do Sol 500 g · em cubos, sem escaldar</span>
   </div>
@@ -393,7 +398,7 @@ body:has(#cart[open]){overflow:hidden}
 </div></section>
 
 <section id="cardapio" style="padding-top:0"><div class="w">
-  <div class="mhead rv"><div><p class="eb">O cardápio</p><h2>Escolha, monte e <em>reserve.</em></h2></div><p class="mu" style="max-width:36ch">Toque no <b style="color:var(--ac)">+</b> para montar o pedido. Estoque sujeito a confirmação.</p></div>
+  <div class="mhead rv"><div><p class="eb">O cardápio</p><h2>Escolha, monte e <em>reserve.</em></h2></div><p class="mu" style="max-width:36ch">Toque no <b style="color:var(--dest)">+</b> para montar o pedido. Estoque sujeito a confirmação.</p></div>
   <div class="tabs" role="navigation" aria-label="Categorias do cardápio"><div id="tabs"></div></div>
   <div id="mn" aria-live="polite"><div class="sk"></div><div class="sk"></div><div class="sk"></div><noscript>Ative o JavaScript para ver o cardápio.</noscript></div>
 </div></section>
@@ -434,8 +439,8 @@ body:has(#cart[open]){overflow:hidden}
   <div class="rv"><p class="eb">Sua mesa te espera</p><h2>Seu próximo almoço pode ter <em>gosto de roça.</em></h2>
   <p class="lead">Carne do sol macia, queijo artesanal, iogurte gelado e a mesa do sertão, tudo entregue em Salvador.</p></div>
   <div class="ways">
-    <div class="way bz rv"><div class="core"><small>Pelo site</small><b>Monte seu pedido</b><p>Escolha os produtos no cardápio e reserve com Pix ou cartão.</p><a class="btn" href="#cardapio">Ver cardápio<span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a></div></div>
-    <div class="way bz rv"><div class="core"><small>Pelo WhatsApp</small><b>Fale com a família</b><p>Resposta direto com a gente. Tire dúvidas e confirme seu bairro.</p><a class="btn gh" data-wa href="#pedir">Chamar no WhatsApp<span class="bi"><svg class="ic"><use href="#i-wa"/></svg></span></a></div></div>
+    <div class="way bz rv"><div class="core"><small>Pelo site</small><b>Monte seu pedido</b><p>Escolha os produtos no cardápio e reserve com Pix ou cartão.</p><a class="btn gh" href="#cardapio">Ver cardápio<span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a></div></div>
+    <div class="way bz rv"><div class="core"><small>Pelo WhatsApp</small><b>Fale com a família</b><p>Resposta direto com a gente. Tire dúvidas e confirme seu bairro.</p><a class="btn" data-wa href="#pedir">Chamar no WhatsApp<span class="bi"><svg class="ic"><use href="#i-wa"/></svg></span></a></div></div>
   </div>
   <p class="ps rv">P.S.: Nossos produtos saem rápido e muita coisa esgota. Chama agora e garante o seu.</p>
 </div></section>
