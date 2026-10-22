@@ -1,5 +1,6 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Admin · Gente que Ama Roça</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous"></script>
 <style>
 :root{--bg:#F4F5F7;--card:#fff;--ln:#E4E7EC;--tx:#1A1D23;--mu:#6B7280;--ac:#F26B2A;--ok:#16A34A;--okbg:#DCFCE7;--warn:#D97706;--warnbg:#FEF3C7;--bad:#DC2626;--badbg:#FEE2E2;--blue:#2F6FED;--bluebg:#E8EFFE;--r:12px}
 *{box-sizing:border-box}
@@ -78,6 +79,12 @@ label.f{display:grid;gap:4px;font-size:12px;color:var(--mu);margin:8px 0}
 .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 .stat-row .card{text-align:center}
 .stat-row .card b{display:block;font-size:22px}
+.stat-row-5{grid-template-columns:repeat(5,1fr)}
+.chart-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:20px}
+@media(min-width:900px){.chart-grid{grid-template-columns:repeat(2,1fr)}}
+.chart-card h3{font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px}
+.chart-box{position:relative;height:240px}
+#franges button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
 #lg:not([hidden]){max-width:360px;margin:80px auto 24px;display:grid;gap:10px}
 .bnav{display:none}
 @media(max-width:760px){
@@ -167,18 +174,32 @@ label.f{display:grid;gap:4px;font-size:12px;color:var(--mu);margin:8px 0}
   <div class="list"><table><thead><tr><th>Cliente</th><th>Telefone</th><th>Pedidos</th><th>Total gasto</th><th>Último pedido</th><th>Status</th><th></th></tr></thead><tbody id="cll"></tbody></table></div>
 </section>
 
-<!-- FINANCEIRO -->
+<!-- FINANCEIRO / DASHBOARD -->
 <section id="fi">
-  <div class="stat-row">
+  <div class="subtabs" id="franges">
+    <button data-r="hoje">Hoje</button>
+    <button data-r="ontem">Ontem</button>
+    <button data-r="7">7 dias</button>
+    <button data-r="15">15 dias</button>
+    <button data-r="30" class="on">30 dias</button>
+    <button data-r="mes">Este mês</button>
+  </div>
+  <div class="row" style="margin-bottom:16px">
+    <label class="f" style="margin:0">De<input id="fd1" type="date"></label>
+    <label class="f" style="margin:0">Até<input id="fd2" type="date"></label>
+    <button class="btn p" id="fnew">+ Nova despesa/receita</button>
+  </div>
+  <div class="stat-row stat-row-5">
     <div class="card"><b id="f-rec" style="color:var(--ok)">R$ 0</b><span class="mu">Receitas</span></div>
     <div class="card"><b id="f-des" style="color:var(--bad)">R$ 0</b><span class="mu">Despesas</span></div>
     <div class="card"><b id="f-sal">R$ 0</b><span class="mu">Saldo</span></div>
-    <div class="card"><button class="btn p" id="fnew" style="width:100%;justify-content:center">+ Nova despesa/receita</button></div>
+    <div class="card"><b id="f-ord">0</b><span class="mu">Pedidos no período</span></div>
+    <div class="card"><b id="f-tkt">R$ 0</b><span class="mu">Ticket médio</span></div>
   </div>
-  <div class="row" style="margin-bottom:12px">
-    <label class="f" style="margin:0">De<input id="fd1" type="date"></label>
-    <label class="f" style="margin:0">Até<input id="fd2" type="date"></label>
-    <button class="btn sm" id="ftoday">Hoje</button>
+  <div class="chart-grid">
+    <div class="card chart-card" style="grid-column:1/-1"><h3>Faturamento por dia</h3><div class="chart-box"><canvas id="ch-rev"></canvas></div></div>
+    <div class="card chart-card"><h3>Formas de pagamento</h3><div class="chart-box"><canvas id="ch-pay"></canvas></div></div>
+    <div class="card chart-card"><h3>Produtos mais vendidos</h3><div class="chart-box"><canvas id="ch-top"></canvas></div></div>
   </div>
   <div class="list"><table><thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Pagamento</th><th>Valor</th><th></th></tr></thead><tbody id="fl"></tbody></table></div>
 </section>
@@ -268,7 +289,7 @@ function goTab(t){
   $$('.tabs-main button,.bnav button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
   $$('main section').forEach(s=>s.classList.toggle('on',s.id===t));
   if(t==='cl'&&!CUST.length)loadCustomers();
-  if(t==='fi'&&!FIN.length)loadFinance();
+  if(t==='fi'&&!FIN.length)loadDashboard();
 }
 $$('.tabs-main button,.bnav button').forEach(b=>b.onclick=()=>goTab(b.dataset.t));
 
@@ -486,19 +507,48 @@ $('#cll').addEventListener('click',async e=>{
   $('#od').showModal();
 });
 
-/* ===== Financeiro ===== */
+/* ===== Financeiro / Dashboard ===== */
 function today(){return new Date().toISOString().slice(0,10)}
-$('#fd1').value=today();$('#fd2').value=today();
-$('#ftoday').onclick=()=>{$('#fd1').value=today();$('#fd2').value=today();loadFinance()};
-$('#fd1').onchange=loadFinance;$('#fd2').onchange=loadFinance;
+function addDays(iso,n){const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+function rangeDates(k){
+  const t=today();
+  if(k==='hoje')return[t,t];
+  if(k==='ontem'){const y=addDays(t,-1);return[y,y]}
+  if(k==='7')return[addDays(t,-6),t];
+  if(k==='15')return[addDays(t,-14),t];
+  if(k==='30')return[addDays(t,-29),t];
+  if(k==='mes'){const d=new Date();return[new Date(d.getFullYear(),d.getMonth(),1).toISOString().slice(0,10),t]}
+  return[$('#fd1').value,$('#fd2').value];
+}
+$('#franges').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  $$('#franges button').forEach(x=>x.classList.toggle('on',x===b));
+  const[from,to]=rangeDates(b.dataset.r);$('#fd1').value=from;$('#fd2').value=to;loadDashboard();
+});
+$('#fd1').onchange=()=>{$$('#franges button').forEach(x=>x.classList.remove('on'));loadDashboard()};
+$('#fd2').onchange=()=>{$$('#franges button').forEach(x=>x.classList.remove('on'));loadDashboard()};
+{const[from,to]=rangeDates('30');$('#fd1').value=from;$('#fd2').value=to}
+
+async function loadDashboard(){await Promise.all([loadFinance(),loadRangeOrders()]);renderKPIs();renderCharts()}
 async function loadFinance(){
   const{data,error}=await sb.from('financial_entries').select('*').gte('entry_date',$('#fd1').value).lte('entry_date',$('#fd2').value).order('created_at',{ascending:false});
-  if(error)return alert(error.message);FIN=data;renderFinance();
+  if(error)return alert(error.message);FIN=data;renderFinanceTable();
 }
-function renderFinance(){
+let RANGE_ORDERS=[];
+async function loadRangeOrders(){
+  const{data,error}=await sb.from('orders').select('total_cents,fulfillment_status,created_at,order_items(name,qty)')
+    .gte('created_at',$('#fd1').value+'T00:00:00').lt('created_at',addDays($('#fd2').value,1)+'T00:00:00');
+  if(error)return alert(error.message);
+  RANGE_ORDERS=data.filter(o=>o.fulfillment_status!=='cancelado');
+}
+function renderKPIs(){
   const rec=FIN.filter(f=>f.kind==='receita').reduce((a,f)=>a+f.amount_cents,0);
   const des=FIN.filter(f=>f.kind==='despesa').reduce((a,f)=>a+f.amount_cents,0);
   $('#f-rec').textContent=R(rec);$('#f-des').textContent=R(des);$('#f-sal').textContent=R(rec-des);
+  $('#f-ord').textContent=RANGE_ORDERS.length;
+  $('#f-tkt').textContent=R(RANGE_ORDERS.length?Math.round(RANGE_ORDERS.reduce((a,o)=>a+o.total_cents,0)/RANGE_ORDERS.length):0);
+}
+function renderFinanceTable(){
   $('#fl').innerHTML=FIN.map(f=>`<tr data-id="${f.id}"><td data-label="Data">${new Date(f.entry_date+'T12:00').toLocaleDateString('pt-BR')}</td>
     <td data-label="Tipo">${f.kind==='receita'?'<span class="pill ok">Receita</span>':'<span class="pill bad">Despesa</span>'}</td>
     <td data-label="Categoria">${esc(f.category)}${f.order_id?' <span class="mu">(pedido)</span>':''}</td><td data-label="Pagamento">${esc(f.payment_method)}</td>
@@ -508,7 +558,7 @@ function renderFinance(){
 $('#fl').addEventListener('click',async e=>{
   const b=e.target.closest('button[data-a="del"]');if(!b)return;if(!confirm('Excluir este lançamento?'))return;
   const id=e.target.closest('tr').dataset.id;const{error}=await sb.from('financial_entries').delete().eq('id',id);
-  if(error)return alert(error.message);loadFinance();
+  if(error)return alert(error.message);loadDashboard();
 });
 $('#fnew').onclick=()=>{$('#ffi').reset();$('#fidate').value=today();$('#fdm').showModal()};
 $('#fix').onclick=()=>$('#fdm').close();
@@ -517,8 +567,38 @@ $('#ffi').onsubmit=async e=>{
   const row={kind:$('#fik').value,entry_date:$('#fidate').value,category:$('#fica').value.trim()||'Geral',payment_method:$('#fipm').value,amount_cents:num($('#fival').value),note:$('#finote').value.trim()||null};
   if(!row.amount_cents)return alert('Informe um valor.');
   const{error}=await sb.from('financial_entries').insert(row);
-  if(error)return alert(error.message);$('#fdm').close();loadFinance();
+  if(error)return alert(error.message);$('#fdm').close();loadDashboard();
 };
+
+/* Gráficos (Chart.js) */
+const CH={};
+const PALETTE=['#F26B2A','#2F6FED','#16A34A','#D97706','#DC2626','#7C3AED','#0891B2','#DB2777'];
+function destroyChart(k){CH[k]?.destroy();}
+function renderCharts(){ renderRevChart(); renderPayChart(); renderTopChart(); }
+function dayLabel(iso){return new Date(iso+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}
+function renderRevChart(){
+  const days=[];for(let d=$('#fd1').value;d<=$('#fd2').value;d=addDays(d,1))days.push(d);
+  const rec=days.map(d=>FIN.filter(f=>f.kind==='receita'&&f.entry_date===d).reduce((a,f)=>a+f.amount_cents,0)/100);
+  const des=days.map(d=>FIN.filter(f=>f.kind==='despesa'&&f.entry_date===d).reduce((a,f)=>a+f.amount_cents,0)/100);
+  destroyChart('rev');
+  CH.rev=new Chart($('#ch-rev'),{type:'line',data:{labels:days.map(dayLabel),datasets:[
+    {label:'Receita',data:rec,borderColor:'#16A34A',backgroundColor:'#16A34A22',fill:true,tension:.3},
+    {label:'Despesa',data:des,borderColor:'#DC2626',backgroundColor:'#DC262622',fill:true,tension:.3}
+  ]},options:{maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$ '+v}}},plugins:{legend:{position:'bottom'}}}});
+}
+function renderPayChart(){
+  const rec=FIN.filter(f=>f.kind==='receita');
+  const byPm={};rec.forEach(f=>byPm[f.payment_method]=(byPm[f.payment_method]||0)+f.amount_cents);
+  const labels=Object.keys(byPm),vals=labels.map(l=>byPm[l]/100);
+  destroyChart('pay');
+  CH.pay=new Chart($('#ch-pay'),{type:'doughnut',data:{labels,datasets:[{data:vals,backgroundColor:PALETTE}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+}
+function renderTopChart(){
+  const qty={};RANGE_ORDERS.forEach(o=>o.order_items.forEach(i=>qty[i.name]=(qty[i.name]||0)+i.qty));
+  const top=Object.entries(qty).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  destroyChart('top');
+  CH.top=new Chart($('#ch-top'),{type:'bar',data:{labels:top.map(t=>t[0]),datasets:[{label:'Unidades vendidas',data:top.map(t=>t[1]),backgroundColor:PALETTE[1]}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}}}}});
+}
 
 boot();
 </script>
