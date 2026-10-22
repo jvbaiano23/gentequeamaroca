@@ -152,7 +152,7 @@ label.f{display:grid;gap:4px;font-size:12px;color:var(--mu);margin:8px 0}
 
 <!-- PRODUTOS -->
 <section id="pr">
-  <div class="row" style="margin-bottom:12px"><button class="btn p" id="new">+ Novo produto</button><input id="qp" class="g" type="search" placeholder="Buscar produto…"></div>
+  <div class="row" style="margin-bottom:12px"><button class="btn p" id="new">+ Novo produto</button><input id="qp" class="g" type="search" placeholder="Buscar produto…"><select id="cp"><option value="">Todas as categorias</option></select></div>
   <div class="list"><table><thead><tr><th></th><th>Produto</th><th>Categoria</th><th>Custo</th><th>Venda</th><th>Margem</th><th>Estoque</th><th></th></tr></thead><tbody id="pl"></tbody></table></div>
 </section>
 
@@ -164,7 +164,7 @@ label.f{display:grid;gap:4px;font-size:12px;color:var(--mu);margin:8px 0}
     <div class="card"><b id="e-off" style="color:var(--bad)">0</b><span class="mu">Esgotado</span></div>
     <div class="card"><b id="e-tot">0</b><span class="mu">Produtos</span></div>
   </div>
-  <div class="row" style="margin-bottom:12px"><input id="qe" class="g" type="search" placeholder="Buscar produto…"></div>
+  <div class="row" style="margin-bottom:12px"><input id="qe" class="g" type="search" placeholder="Buscar produto…"><select id="ce"><option value="">Todas as categorias</option></select></div>
   <div class="list"><table><thead><tr><th>Produto</th><th>Categoria</th><th>Mín.</th><th>Estoque</th><th>Status</th><th></th></tr></thead><tbody id="el"></tbody></table></div>
 </section>
 
@@ -410,11 +410,14 @@ $('#ob').addEventListener('click',async e=>{
 
 /* ===== Produtos ===== */
 $('#fc').innerHTML=Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+const catOpts=Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+$('#cp').insertAdjacentHTML('beforeend',catOpts);
+$('#ce').insertAdjacentHTML('beforeend',catOpts);
 async function loadProducts(){const{data,error}=await sb.from('products').select('*').order('category').order('sort');if(error)return alert(error.message);PR=data;renderProducts();renderStock()}
 function margin(p){if(!p.price_cents)return '—';const m=((p.price_cents-p.cost_cents)/p.price_cents*100);return m.toFixed(0)+'%'}
 function renderProducts(){
-  const q=norm($('#qp').value);
-  const L=PR.filter(p=>!q||norm(p.name+' '+catName(p.category)).includes(q));
+  const q=norm($('#qp').value),c=$('#cp').value;
+  const L=PR.filter(p=>(!c||p.category===c)&&(!q||norm(p.name+' '+catName(p.category)).includes(q)));
   $('#pl').innerHTML=L.map(p=>`<tr data-id="${p.id}">
     <td>${p.image_url?`<img class="th-img" src="${esc(p.image_url)}">`:''}</td>
     <td data-label="Produto"><b>${esc(p.name)}</b>${p.visible?'':' <span class="pill mu">oculto</span>'}${p.combo_qty?` <span class="pill blue">${p.combo_qty}un/${R(p.combo_price_cents)}</span>`:''}</td>
@@ -426,7 +429,7 @@ function renderProducts(){
     <td><button class="btn sm" data-a="e">Editar</button> <button class="btn sm" data-a="v">${p.visible?'Esconder':'Mostrar'}</button></td>
   </tr>`).join('')||'<tr><td colspan="8" class="empty">Nenhum produto.</td></tr>';
 }
-$('#qp').oninput=renderProducts;
+$('#qp').oninput=renderProducts;$('#cp').onchange=renderProducts;
 $('#pl').addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b)return;const tr=e.target.closest('tr'),p=PR.find(x=>x.id===tr.dataset.id);
   if(b.dataset.a==='e')openProduct(p);
@@ -457,7 +460,7 @@ $('#ff').onsubmit=async e=>{
 
 /* ===== Estoque ===== */
 function renderStock(){
-  const q=norm($('#qe').value),L=PR.filter(p=>!q||norm(p.name).includes(q));
+  const q=norm($('#qe').value),c=$('#ce').value,L=PR.filter(p=>(!c||p.category===c)&&(!q||norm(p.name).includes(q)));
   let ok=0,low=0,off=0;
   PR.forEach(p=>p.stock<=0?off++:p.stock<=p.stock_min?low++:ok++);
   $('#e-ok').textContent=ok;$('#e-low').textContent=low;$('#e-off').textContent=off;$('#e-tot').textContent=PR.length;
@@ -466,7 +469,7 @@ function renderStock(){
     <td data-label="Estoque"><input data-a="st" style="width:70px" type="number" min="0" value="${p.stock}"></td><td data-label="Status">${st}</td>
     <td><button class="btn sm" data-a="d" data-n="-5">−5</button> <button class="btn sm" data-a="d" data-n="-1">−1</button> <button class="btn sm" data-a="d" data-n="1">+1</button> <button class="btn sm" data-a="d" data-n="5">+5</button></td></tr>`}).join('')||'<tr><td colspan="6" class="empty">Nenhum produto.</td></tr>';
 }
-$('#qe').oninput=renderStock;
+$('#qe').oninput=renderStock;$('#ce').onchange=renderStock;
 $('#el').addEventListener('click',async e=>{
   const b=e.target.closest('button[data-a="d"]');if(!b)return;const tr=e.target.closest('tr');
   const{error}=await sb.rpc('adjust_stock',{p_id:tr.dataset.id,p_delta:parseInt(b.dataset.n)});
